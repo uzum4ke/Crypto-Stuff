@@ -1,10 +1,11 @@
 
 import Data.Sequence (Seq, (<|), empty)
+import Data.Foldable (toList)
 import qualified Data.Sequence as Seq
 import Data.Time.Clock.POSIX (POSIXTime, posixSecondsToUTCTime, utcTimeToPOSIXSeconds)
 import Data.Time.Clock (getCurrentTime)
 import Crypto.Hash (hashWith, SHA256 (..), Digest)
-import Data.ByteString.Char8 as BC hiding (index, null, head)
+import Data.ByteString.Char8 as BC hiding (index, null, head, putStrLn)
 import Data.ByteString (ByteString)
 import Data.ByteString.Char8 (pack)
 import Data.Text.Encoding (encodeUtf8)
@@ -62,11 +63,36 @@ addBlock blockchain newData = do
         }
     return (newBlock <| blockchain)  -- Prepend the new block to the blockchain
 
-
--- Assuming the Block and Blockchain types, genesisBlock and addBlock functions are defined as previously discussed
 main :: IO ()
 main = do
     genBlock <- genesisBlock
-    let initialBlockchain =  genBlock  <| Seq.empty -- Initialize the blockchain with the genesis block
-    blockchain <- addBlock initialBlockchain "First actual block"
-    print blockchain
+    let initialBlockchain = genBlock <| Seq.empty -- Initialize the blockchain with the genesis block
+    blockchain1 <- addBlock initialBlockchain "First actual block"
+    blockchain2 <- addBlock blockchain1 "Second actual block"
+    blockchain3 <- addBlock blockchain2 "Third actual block"
+
+    -- Print each blockchain state after each addition to see the chain growth
+    putStrLn "Blockchain after adding first block:"
+    prettyPrintBlockchain blockchain1
+    putStrLn "Blockchain after adding second block:"
+    prettyPrintBlockchain blockchain2
+    putStrLn "Blockchain after adding third block:"
+    prettyPrintBlockchain blockchain3
+
+-- Helper function to pretty print the blockchain
+prettyPrintBlockchain :: Blockchain -> IO ()
+prettyPrintBlockchain blockchain = do
+    putStrLn "Current Blockchain:"
+    mapM_ printBlock (toList blockchain)
+  where
+    printBlock :: Block -> IO ()
+    printBlock block = do
+        putStrLn $ "Block Index: " ++ show (index block)
+        putStrLn $ "Timestamp: " ++ show (posixSecondsToUTCTime $ timestamp block) ++ "s"
+        putStrLn $ "Block Data: " ++ BC.unpack (blockData block)
+        putStrLn $ "Previous Hash: " ++ BC.unpack (previousHash block)
+        putStrLn $ "Nonce: " ++ show (nonce block)
+        putStrLn "----------------------------------------"
+        putStrLn "----------------------------------------"
+        putStrLn "----------------------------------------"
+
