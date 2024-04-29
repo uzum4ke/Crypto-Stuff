@@ -41,7 +41,6 @@ hashBlock block =
         hashDigest = hashWith SHA256 blockContent
     in show hashDigest
 
-
 -- Generate the genesis block.
 genesisBlock :: IO Block
 genesisBlock = do
@@ -70,7 +69,6 @@ addBlock blockchain transactions
           }
       return $ Just (newBlock <| blockchain) -- Prepend the new block to the blockchain 
 
-
 -- Helper function to pretty print the blockchain
 prettyPrintBlockchain :: Blockchain -> IO ()
 prettyPrintBlockchain blockchain = do
@@ -95,8 +93,6 @@ prettyPrintBlockchain blockchain = do
         putStrLn $ "  Signature: " ++ BC.unpack (signature tx)
         putStrLn "  ----------------------"
         
-
-
 createDummyTransaction :: Int -> Transaction
 createDummyTransaction n = Transaction {
     sender = pack $ "sender" ++ show n,
@@ -104,7 +100,6 @@ createDummyTransaction n = Transaction {
     amount = fromIntegral (n * 100),
     signature = pack $ "signature" ++ show n
 }
-
 
 main :: IO ()
 main = do
